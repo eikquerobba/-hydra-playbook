@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<title>Hydra Playbook</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#0D0D0D;
+  --bg2:#161616;
+  --bg3:#1E1E1E;
+  --bg4:#262626;
+  --border:#2E2E2E;
+  --text1:#F0F0F0;
+  --text2:#A0A0A0;
+  --text3:#606060;
+  --blue:#4A9EFF;
+  --blue-dim:#1A3A5C;
+  --blue-bg:#0D1F35;
+  --red:#FF5A5A;
+  --red-dim:#5C1A1A;
+  --red-bg:#350D0D;
+  --green:#4AE08A;
+  --green-dim:#1A5C3A;
+  --green-bg:#0D3520;
+  --amber:#FFB84A;
+  --amber-dim:#5C3A1A;
+  --amber-bg:#35200D;
+  --radius:12px;
+  --radius-sm:8px;
+  --radius-xs:5px;
+}
+html,body{background:var(--bg);color:var(--text1);font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:15px;line-height:1.5;min-height:100vh;overscroll-behavior:none}
+
+/* Nav */
+.nav{position:sticky;top:0;z-index:100;background:rgba(13,13,13,0.92);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);border-bottom:1px solid var(--border);padding:0 4px}
+.nav-inner{display:flex;overflow-x:auto;scrollbar-width:none;gap:2px;padding:8px 4px}
+.nav-inner::-webkit-scrollbar{display:none}
+.nav-btn{flex-shrink:0;padding:7px 14px;border-radius:20px;font-size:13px;font-weight:500;color:var(--text2);background:none;border:none;cursor:pointer;white-space:nowrap;transition:all 0.15s}
+.nav-btn.active{background:var(--blue-dim);color:var(--blue)}
+
+/* Header */
+.header{padding:24px 16px 16px;border-bottom:1px solid var(--border)}
+.header-label{font-size:11px;font-weight:600;letter-spacing:0.1em;color:var(--text3);text-transform:uppercase;margin-bottom:6px}
+.header-title{font-size:24px;font-weight:600;color:var(--text1);margin-bottom:4px}
+.header-sub{font-size:13px;color:var(--text2)}
+
+/* Pages */
+.page{display:none;padding:0 0 100px}
+.page.active{display:block}
+
+/* Section */
+.section{padding:16px}
+.section-label{font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--text3);text-transform:uppercase;margin-bottom:12px}
+
+/* Card */
+.card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px}
+.card-blue{border-left:3px solid var(--blue)}
+.card-red{border-left:3px solid var(--red)}
+.card-green{border-left:3px solid var(--green)}
+.card-amber{border-left:3px solid var(--amber)}
+
+/* Time blocks */
+.time-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.time-block{border-radius:var(--radius-sm);padding:10px 12px;border:1px solid var(--border)}
+.time-block.blue{background:var(--blue-bg);border-color:var(--blue-dim)}
+.time-block.amber{background:var(--amber-bg);border-color:var(--amber-dim)}
+.time-block.red{background:var(--red-bg);border-color:var(--red-dim)}
+.time-block.neutral{background:var(--bg3)}
+.time-block.full{grid-column:1/-1}
+.time-et{font-size:13px;font-weight:600;color:var(--text1)}
+.time-th{font-size:11px;color:var(--text2);margin-top:1px}
+.time-role{font-size:12px;font-weight:500;margin-top:4px}
+.time-block.blue .time-role{color:var(--blue)}
+.time-block.amber .time-role{color:var(--amber)}
+.time-block.red .time-role{color:var(--red)}
+.time-block.neutral .time-role{color:var(--text2)}
+.star{font-size:10px;margin-left:4px}
+
+/* Steps */
+.step{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)}
+.step:last-child{border-bottom:none}
+.step-num{width:24px;height:24px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0;margin-top:1px}
+.step-num.blue{background:var(--blue-dim);color:var(--blue)}
+.step-num.red{background:var(--red-dim);color:var(--red)}
+.step-num.amber{background:var(--amber-dim);color:var(--amber)}
+.step-body{}
+.step-main{font-size:14px;color:var(--text1);font-weight:500}
+.step-sub{font-size:12px;color:var(--text2);margin-top:2px;line-height:1.5}
+
+/* Flow */
+.flow{display:flex;flex-direction:column;gap:0;margin:4px 0}
+.flow-item{display:flex;align-items:flex-start;gap:10px;padding:8px 0}
+.flow-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;margin-top:6px}
+.flow-line{width:8px;display:flex;justify-content:center;flex-shrink:0;padding:0 3.5px}
+.flow-line-inner{width:1px;background:var(--border);flex:1;min-height:16px}
+.flow-text{font-size:13px;color:var(--text1);line-height:1.5}
+.flow-sub{font-size:12px;color:var(--text2);margin-top:1px}
+
+/* Rules */
+.rule-row{display:flex;gap:8px;padding:8px 0;border-bottom:1px solid var(--border)}
+.rule-row:last-child{border-bottom:none}
+.rule-icon{font-size:16px;flex-shrink:0;width:20px;text-align:center}
+.rule-text{font-size:13px;color:var(--text1);line-height:1.5}
+
+/* Checklist */
+.check-item{display:flex;gap:10px;align-items:flex-start;padding:11px 0;border-bottom:1px solid var(--border);cursor:pointer;user-select:none;-webkit-user-select:none;transition:opacity 0.15s;active:opacity:0.7}
+.check-item:last-child{border-bottom:none}
+.check-item:active{opacity:0.6}
+.check-box{width:20px;height:20px;border-radius:5px;border:1.5px solid var(--border);flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s;background:var(--bg3)}
+.check-box.on{background:var(--blue);border-color:var(--blue)}
+.check-box.on::after{content:'✓';color:#fff;font-size:12px;font-weight:600}
+.check-label{font-size:14px;color:var(--text1);line-height:1.5}
+.check-sub{font-size:12px;color:var(--text2);margin-top:2px}
+.check-label.done{color:var(--text3);text-decoration:line-through}
+
+/* Progress */
+.progress-wrap{background:var(--bg4);border-radius:100px;height:5px;margin:10px 0 6px}
+.progress-fill{height:5px;border-radius:100px;background:var(--blue);transition:width 0.25s,background 0.25s}
+.score-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.score-big{font-size:26px;font-weight:600;color:var(--text1)}
+.score-den{font-size:14px;color:var(--text2)}
+.reset-btn{font-size:12px;color:var(--text2);background:var(--bg3);border:1px solid var(--border);border-radius:20px;padding:5px 12px;cursor:pointer}
+
+/* Badge */
+.badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;font-weight:600;padding:3px 8px;border-radius:20px}
+.badge.blue{background:var(--blue-dim);color:var(--blue)}
+.badge.red{background:var(--red-dim);color:var(--red)}
+.badge.green{background:var(--green-dim);color:var(--green)}
+.badge.amber{background:var(--amber-dim);color:var(--amber)}
+
+/* Golden rule */
+.golden{background:var(--amber-bg);border:1px solid var(--amber-dim);border-radius:var(--radius);padding:14px 16px;margin:0 16px 16px}
+.golden-text{font-size:14px;font-weight:600;color:var(--amber);line-height:1.6}
+
+/* Model switcher */
+.model-tabs{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:0 16px 2px}
+.model-tab{padding:10px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--bg2);text-align:center;cursor:pointer;transition:all 0.15s}
+.model-tab.active.bull{background:var(--blue-bg);border-color:var(--blue-dim)}
+.model-tab.active.bear{background:var(--red-bg);border-color:var(--red-dim)}
+.model-tab-label{font-size:12px;font-weight:600}
+.model-tab.active.bull .model-tab-label{color:var(--blue)}
+.model-tab.active.bear .model-tab-label{color:var(--red)}
+.model-tab:not(.active) .model-tab-label{color:var(--text2)}
+.model-tab-sub{font-size:11px;color:var(--text2);margin-top:2px}
+.model-content{display:none}
+.model-content.active{display:block}
+
+/* Divider */
+.divider{height:1px;background:var(--border);margin:4px 0}
+
+/* KPI row */
+.kpi-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi{background:var(--bg3);border-radius:var(--radius-sm);padding:10px;text-align:center}
+.kpi-val{font-size:16px;font-weight:600;color:var(--text1)}
+.kpi-label{font-size:11px;color:var(--text2);margin-top:2px}
+
+/* Accordion */
+.acc-header{display:flex;justify-content:space-between;align-items:center;padding:12px 0;cursor:pointer;user-select:none}
+.acc-title{font-size:14px;font-weight:500;color:var(--text1)}
+.acc-arrow{font-size:14px;color:var(--text2);transition:transform 0.2s}
+.acc-header.open .acc-arrow{transform:rotate(180deg)}
+.acc-body{display:none;padding-bottom:8px}
+.acc-body.open{display:block}
+.acc-divider{height:1px;background:var(--border)}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-label">MNQ — ICT Pure</div>
+  <div class="header-title">Hydra Playbook</div>
+  <div class="header-sub">Inversion &amp; Breaker — Silver Bullet Macro</div>
+</div>
+
+<nav class="nav">
+  <div class="nav-inner">
+    <button class="nav-btn active" onclick="goPage('time',this)">เวลา</button>
+    <button class="nav-btn" onclick="goPage('topdown',this)">Top-Down</button>
+    <button class="nav-btn" onclick="goPage('inversion',this)">Inversion</button>
+    <button class="nav-btn" onclick="goPage('breaker',this)">Breaker</button>
+    <button class="nav-btn" onclick="goPage('checklist',this)">Checklist</button>
+    <button class="nav-btn" onclick="goPage('rules',this)">กฎ</button>
+    <button class="nav-btn" onclick="goPage('concepts',this)">Concepts</button>
+  </div>
+</nav>
+
+<!-- PAGE: TIME -->
+<div class="page active" id="page-time">
+  <div class="section">
+    <div class="section-label">Session Timeline</div>
+    <div class="time-grid">
+      <div class="time-block neutral full">
+        <div class="time-et">6:00 – 9:30 AM ET</div>
+        <div class="time-th">17:00 – 20:30 น. ไทย</div>
+        <div class="time-role">เตรียม Top-Down Analysis</div>
+      </div>
+      <div class="time-block amber full">
+        <div class="time-et">9:30 – 10:20 AM ET</div>
+        <div class="time-th">20:30 – 21:20 น. ไทย</div>
+        <div class="time-role">จับ NY Open Sweep Direction</div>
+      </div>
+      <div class="time-block blue">
+        <div class="time-et">10:20 – 10:40 <span class="star">⭐</span></div>
+        <div class="time-th">21:20 – 21:40 ไทย</div>
+        <div class="time-role">Window 1 — หลัก</div>
+      </div>
+      <div class="time-block blue">
+        <div class="time-et">10:50 – 11:10</div>
+        <div class="time-th">21:50 – 22:10 ไทย</div>
+        <div class="time-role">Window 2 — สำรอง</div>
+      </div>
+      <div class="time-block red full">
+        <div class="time-et">11:10 AM – 2:00 PM ET</div>
+        <div class="time-th">22:10 – 01:00 น. ไทย</div>
+        <div class="time-role">NY Lunch — ห้ามเทรดเด็ดขาด</div>
+      </div>
+      <div class="time-block neutral full">
+        <div class="time-et">2:00 – 3:30 PM ET</div>
+        <div class="time-th">01:00 – 02:30 น. ไทย</div>
+        <div class="time-role">PM Session — รองลงมา</div>
+      </div>
+    </div>
+    <div class="card card-amber" style="margin-top:4px">
+      <div style="font-size:13px;color:var(--amber);font-weight:600;margin-bottom:6px">ตรรกะของ Windows</div>
+      <div style="font-size:13px;color:var(--text2);line-height:1.7">9:30 NY Open พา Volatility เข้ามา → Sweep Liquidity → 10:20 Macro คือช่วงที่ Distribution เริ่ม ราคาวิ่งหา DOL ฝั่งตรงข้ามจาก Sweep</div>
+    </div>
+  </div>
+  <div class="golden">
+    <div class="golden-text">ไม่มี Sweep ก่อน Macro = ไม่มี Setup = ไม่เข้า</div>
+  </div>
+</div>
+
+<!-- PAGE: TOP-DOWN -->
+<div class="page" id="page-topdown">
+  <div class="section">
+    <div class="section-label">ก่อน 9:30 — เตรียม (ทุกวัน)</div>
+    <div class="card card-blue">
+      <div style="font-size:13px;font-weight:600;color:var(--blue);margin-bottom:10px">IPDA Framework</div>
+      <div class="step">
+        <div class="step-num blue">1</div>
+        <div class="step-body">
+          <div class="step-main">20 / 40 / 60 Day H&amp;L</div>
+          <div class="step-sub">นับย้อนหลังบน Daily — ราคาอยู่ Discount หรือ Premium? Discount = เน้น Buy / Premium = เน้น Sell</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">2</div>
+        <div class="step-body">
+          <div class="step-main">D1 Bias</div>
+          <div class="step-sub">BOS ขึ้น = Bullish / BOS ลง = Bearish — ดู Previous Daily Candle ปิด Bullish หรือ Bearish</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">3</div>
+        <div class="step-body">
+          <div class="step-main">H4 ยืนยัน Bias</div>
+          <div class="step-sub">HH + HL = Bullish ยืนยัน / LH + LL = Bearish ยืนยัน</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">4</div>
+        <div class="step-body">
+          <div class="step-main">Mark Liquidity ทั้งสองฝั่ง</div>
+          <div class="step-sub">BSL = EQH, Swing Highs, PDH / SSL = EQL, Swing Lows, PDL</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">5</div>
+        <div class="step-body">
+          <div class="step-main">กำหนด DOL</div>
+          <div class="step-sub">Liquidity Pool ที่ชัดที่สุดในทิศ Bias — นี่คือ TP ของวัน ต้องรู้ก่อน 9:30</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num blue">6</div>
+        <div class="step-body">
+          <div class="step-main">เปิด MES คู่กับ MNQ</div>
+          <div class="step-sub">2 Charts ข้างกัน พร้อม SMT ตลอด</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="divider" style="margin:4px 0 12px"></div>
+    <div class="section-label">9:30 – 10:20 — จับ Direction</div>
+    <div class="card card-amber">
+      <div class="step">
+        <div class="step-num amber">1</div>
+        <div class="step-body">
+          <div class="step-main">NY Open วิ่งทิศไหนก่อน?</div>
+          <div class="step-sub">ขึ้นก่อน = Sweep BSL → เตรียม Sell / ลงก่อน = Sweep SSL → เตรียม Buy</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num amber">2</div>
+        <div class="step-body">
+          <div class="step-main">Liquidity Sweep เกิดขึ้นแล้วหรือยัง?</div>
+          <div class="step-sub">ถ้ายัง = รอต่อ ห้าม Entry เด็ดขาดก่อน Sweep</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num amber">3</div>
+        <div class="step-body">
+          <div class="step-main">SMT ยืนยัน</div>
+          <div class="step-sub">MNQ Sweep Low ใหม่ แต่ MES ไม่ Sweep = Bullish Signal / กลับกัน = Bearish Signal</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num amber">4</div>
+        <div class="step-body">
+          <div class="step-main">เลือก Model</div>
+          <div class="step-sub">FVG ล้มเหลว → Inversion / OB ล้มเหลว → Breaker Block</div>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num amber">5</div>
+        <div class="step-body">
+          <div class="step-main">Mark Zone รอ Retest</div>
+          <div class="step-sub">IFVG Zone หรือ Breaker Zone พร้อมสำหรับ Macro Window</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: INVERSION -->
+<div class="page" id="page-inversion">
+  <div style="padding:16px 16px 8px">
+    <div class="section-label">Model 1 — Inversion (IFVG)</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">FVG ปกติล้มเหลว → กลับขั้วเป็น Support/Resistance ใหม่ ใช้ในวันที่ Momentum แรง</div>
+    <div class="model-tabs">
+      <div class="model-tab bull active" onclick="switchModel('bull',this)">
+        <div class="model-tab-label">Bullish</div>
+        <div class="model-tab-sub">Buy Setup</div>
+      </div>
+      <div class="model-tab bear" onclick="switchModel('bear',this)">
+        <div class="model-tab-label">Bearish</div>
+        <div class="model-tab-sub">Sell Setup</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:8px">
+    <div class="model-content active" id="inv-bull">
+      <div class="card card-blue">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="badge blue">Buy</span>
+          <span style="font-size:13px;color:var(--text2)">Bullish IFVG</span>
+        </div>
+        <div class="step"><div class="step-num blue">1</div><div class="step-body"><div class="step-main">D1/H4 Bias = Bullish</div><div class="step-sub">BOS ขึ้น + DOL (BSL) อยู่เหนือราคา + IPDA Discount</div></div></div>
+        <div class="step"><div class="step-num blue">2</div><div class="step-body"><div class="step-main">Mark SSL + Bearish FVG ใกล้ SSL</div><div class="step-sub">FVG ที่ "น่าจะล้มเหลว" เพราะอยู่ตรง SSL</div></div></div>
+        <div class="step"><div class="step-num blue">3</div><div class="step-body"><div class="step-main">NY Open 9:30 Sweep SSL</div><div class="step-sub">ราคาลงไปเก็บ SSL ก่อน Macro Window เปิด</div></div></div>
+        <div class="step"><div class="step-num blue">4</div><div class="step-body"><div class="step-main">ราคาทะลุ FVG ขึ้น → IFVG ก่อตัว</div><div class="step-sub">FVG เดิมกลายเป็น Support ใหม่ (Inversion)</div></div></div>
+        <div class="step"><div class="step-num blue">5</div><div class="step-body"><div class="step-main">รอ Pullback กลับมา Retest IFVG</div><div class="step-sub">ดู Rejection + MSS บน M5 ยืนยัน</div></div></div>
+        <div class="step"><div class="step-num blue">6</div><div class="step-body"><div class="step-main">Entry ใน Macro 10:20–10:40</div><div class="step-sub">SL ใต้ Low ของ IFVG / TP = BSL (DOL)</div></div></div>
+      </div>
+      <div class="card" style="background:var(--blue-bg);border-color:var(--blue-dim)">
+        <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:8px;letter-spacing:0.06em">DIAGRAM</div>
+        <div style="font-family:monospace;font-size:12px;color:var(--text2);line-height:2">
+          BSL (DOL) ═══════════════ ← TP<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ Distribution<br>
+          IFVG ─ ─ ─ ─ ─ ─ ─ ─ ─ ← Entry (Retest)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ FVG ถูกทะลุ<br>
+          SSL ═════════════════════ ← Sweep ตรงนี้<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ SL ใต้นี้
+        </div>
+      </div>
+    </div>
+
+    <div class="model-content" id="inv-bear">
+      <div class="card card-red">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="badge red">Sell</span>
+          <span style="font-size:13px;color:var(--text2)">Bearish IFVG</span>
+        </div>
+        <div class="step"><div class="step-num red">1</div><div class="step-body"><div class="step-main">D1/H4 Bias = Bearish</div><div class="step-sub">BOS ลง + DOL (SSL) อยู่ใต้ราคา + IPDA Premium</div></div></div>
+        <div class="step"><div class="step-num red">2</div><div class="step-body"><div class="step-main">Mark BSL + Bullish FVG ใกล้ BSL</div><div class="step-sub">FVG ที่น่าจะล้มเหลวเพราะอยู่ตรง BSL</div></div></div>
+        <div class="step"><div class="step-num red">3</div><div class="step-body"><div class="step-main">NY Open 9:30 Sweep BSL</div><div class="step-sub">ราคาขึ้นไปเก็บ BSL ก่อน Macro Window เปิด</div></div></div>
+        <div class="step"><div class="step-num red">4</div><div class="step-body"><div class="step-main">ราคาทะลุ FVG ลง → IFVG ก่อตัว</div><div class="step-sub">FVG เดิมกลายเป็น Resistance ใหม่</div></div></div>
+        <div class="step"><div class="step-num red">5</div><div class="step-body"><div class="step-main">รอ Pullback กลับมา Retest IFVG</div><div class="step-sub">ดู Rejection + MSS บน M5 ยืนยัน</div></div></div>
+        <div class="step"><div class="step-num red">6</div><div class="step-body"><div class="step-main">Entry ใน Macro 10:20–10:40</div><div class="step-sub">SL เหนือ High ของ IFVG / TP = SSL (DOL)</div></div></div>
+      </div>
+      <div class="card" style="background:var(--red-bg);border-color:var(--red-dim)">
+        <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:8px;letter-spacing:0.06em">DIAGRAM</div>
+        <div style="font-family:monospace;font-size:12px;color:var(--text2);line-height:2">
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑ SL เหนือนี้<br>
+          BSL ═════════════════════ ← Sweep ตรงนี้<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ FVG ถูกทะลุ<br>
+          IFVG ─ ─ ─ ─ ─ ─ ─ ─ ─ ← Entry (Retest)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓ Distribution<br>
+          SSL (DOL) ═══════════════ ← TP
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: BREAKER -->
+<div class="page" id="page-breaker">
+  <div style="padding:16px 16px 8px">
+    <div class="section-label">Model 2 — Breaker Block</div>
+    <div style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">OB ปกติล้มเหลว → กลับขั้วเป็น Breaker ใช้เมื่อต้องการ RR สูง SL แคบ</div>
+    <div class="model-tabs">
+      <div class="model-tab bull active" id="brk-tab-bull" onclick="switchBreaker('bull',this)">
+        <div class="model-tab-label">Bullish</div>
+        <div class="model-tab-sub">Buy Setup</div>
+      </div>
+      <div class="model-tab bear" id="brk-tab-bear" onclick="switchBreaker('bear',this)">
+        <div class="model-tab-label">Bearish</div>
+        <div class="model-tab-sub">Sell Setup</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section" style="padding-top:8px">
+    <div class="model-content active" id="brk-bull">
+      <div class="card card-blue">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="badge blue">Buy</span>
+          <span style="font-size:13px;color:var(--text2)">Bullish Breaker</span>
+        </div>
+        <div class="step"><div class="step-num blue">1</div><div class="step-body"><div class="step-main">D1/H4 Bias = Bullish + IPDA Discount</div><div class="step-sub">DOL (BSL) อยู่เหนือราคา ยังไม่ถูก Sweep</div></div></div>
+        <div class="step"><div class="step-num blue">2</div><div class="step-body"><div class="step-main">Mark Bearish OB บน H1/M15</div><div class="step-sub">แท่งขาขึ้นสุดท้ายก่อน Impulse ลง</div></div></div>
+        <div class="step"><div class="step-num blue">3</div><div class="step-body"><div class="step-main">NY Open Sweep SSL</div><div class="step-sub">ราคาดิ่งลงไปเก็บ SSL ก่อน Macro</div></div></div>
+        <div class="step"><div class="step-num blue">4</div><div class="step-body"><div class="step-main">ราคาทะลุ Bearish OB ขึ้น</div><div class="step-sub">OB เดิมกลายเป็น Bullish Breaker Zone</div></div></div>
+        <div class="step"><div class="step-num blue">5</div><div class="step-body"><div class="step-main">ใน Macro — รอ Retest Breaker 50%</div><div class="step-sub">ราคากลับลงมาแตะกลาง Breaker Zone</div></div></div>
+        <div class="step"><div class="step-num blue">6</div><div class="step-body"><div class="step-main">Entry / SL / TP</div><div class="step-sub">Limit Order ที่ 50% Zone / SL ใต้ Low / TP = BSL</div></div></div>
+      </div>
+      <div class="card" style="background:var(--blue-bg);border-color:var(--blue-dim)">
+        <div style="font-size:11px;color:var(--blue);font-weight:600;margin-bottom:8px;letter-spacing:0.06em">DIAGRAM</div>
+        <div style="font-family:monospace;font-size:12px;color:var(--text2);line-height:2">
+          BSL (DOL) ═══════════════ ← TP<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↑<br>
+          Bearish OB ─ ─ ─ ─ ─ ─ ─ ← ทะลุขึ้น = Breaker<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;50% ─ ─ ─ ─ ─ ─ ─ ─ ← Entry (Retest)<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+          SSL ═════════════════════ ← Sweep + SL ใต้นี้
+        </div>
+      </div>
+    </div>
+
+    <div class="model-content" id="brk-bear">
+      <div class="card card-red">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">
+          <span class="badge red">Sell</span>
+          <span style="font-size:13px;color:var(--text2)">Bearish Breaker</span>
+        </div>
+        <div class="step"><div class="step-num red">1</div><div class="step-body"><div class="step-main">D1/H4 Bias = Bearish + IPDA Premium</div><div class="step-sub">DOL (SSL) อยู่ใต้ราคา ยังไม่ถูก Sweep</div></div></div>
+        <div class="step"><div class="step-num red">2</div><div class="step-body"><div class="step-main">Mark Bullish OB บน H1/M15</div><div class="step-sub">แท่งขาลงสุดท้ายก่อน Impulse ขึ้น</div></div></div>
+        <div class="step"><div class="step-num red">3</div><div class="step-body"><div class="step-main">NY Open Sweep BSL</div><div class="step-sub">ราคาพุ่งขึ้นเก็บ BSL ก่อน Macro</div></div></div>
+        <div class="step"><div class="step-num red">4</div><div class="step-body"><div class="step-main">ราคาทะลุ Bullish OB ลง</div><div class="step-sub">OB เดิมกลายเป็น Bearish Breaker Zone</div></div></div>
+        <div class="step"><div class="step-num red">5</div><div class="step-body"><div class="step-main">ใน Macro — รอ Retest Breaker 50%</div><div class="step-sub">ราคากลับขึ้นมาแตะกลาง Breaker Zone</div></div></div>
+        <div class="step"><div class="step-num red">6</div><div class="step-body"><div class="step-main">Entry / SL / TP</div><div class="step-sub">Limit Order ที่ 50% Zone / SL เหนือ High / TP = SSL</div></div></div>
+      </div>
+      <div class="card" style="background:var(--red-bg);border-color:var(--red-dim)">
+        <div style="font-size:11px;color:var(--red);font-weight:600;margin-bottom:8px;letter-spacing:0.06em">DIAGRAM</div>
+        <div style="font-family:monospace;font-size:12px;color:var(--text2);line-height:2">
+          BSL ═════════════════════ ← Sweep + SL เหนือนี้<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;50% ─ ─ ─ ─ ─ ─ ─ ─ ← Entry (Retest)<br>
+          Bullish OB ─ ─ ─ ─ ─ ─ ─ ← ทะลุลง = Breaker<br>
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;↓<br>
+          SSL (DOL) ═══════════════ ← TP
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PAGE: CHECKLIST -->
+<div class="page" id="page-checklist">
+  <div class="section">
+    <div class="section-label">Pre-Trade Checklist</div>
+    <div class="score-row">
+      <div>
+        <span class="score-big" id="score-num">0</span>
+        <span style="font-size:16px;color:var(--text2)">&nbsp;/ 9</span>
+        <div style="font-size:12px;color:var(--text2);margin-top:2px" id="score-msg">ติ๊กให้ครบก่อน Entry</div>
+      </div>
+      <button class="reset-btn" onclick="resetChecklist()">reset วัน</button>
+    </div>
+    <div class="progress-wrap">
+      <div class="progress-fill" id="prog-fill" style="width:0%"></div>
+    </div>
+    <div id="cl-list" style="margin-top:4px">
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">D1/H4 Bias ชัดเจน</div><div class="check-sub">Bullish หรือ Bearish — BOS ยืนยันแล้ว</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">IPDA Dealing Range</div><div class="check-sub">ราคาอยู่ Discount (Buy) หรือ Premium (Sell)</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">DOL กำหนดแล้วก่อน 9:30</div><div class="check-sub">รู้แล้วว่า TP อยู่ที่ไหน</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">Liquidity Sweep เกิดขึ้นแล้ว</div><div class="check-sub">SSL หรือ BSL ถูก Sweep ก่อน Macro</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">SMT ยืนยัน</div><div class="check-sub">MNQ vs MES Divergence ชัดเจน</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">IFVG หรือ Breaker ก่อตัวชัด</div><div class="check-sub">Zone มองเห็นได้ชัดบน M5/M15</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">ราคา Retest Zone แล้ว</div><div class="check-sub">กลับมาแตะ IFVG หรือ Breaker 50%</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">MSS ยืนยันบน M5</div><div class="check-sub">Market Structure Shift ชัดเจน</div></div>
+      </div>
+      <div class="check-item" onclick="ck(this)">
+        <div class="check-box"></div>
+        <div><div class="check-label">อยู่ใน Macro Window</div><div class="check-sub">10:20–10:40 หรือ 10:50–11:10 ET เท่านั้น</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="golden">
+    <div class="golden-text">ต่ำกว่า 7/9 = Skip — ไม่มีข้อยกเว้น</div>
+  </div>
+</div>
+
+<!-- PAGE: RULES -->
+<div class="page" id="page-rules">
+  <div class="section">
+    <div class="section-label">ห้ามทำเด็ดขาด</div>
+    <div class="card card-red" style="margin-bottom:12px">
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">Entry นอก Macro Window ไม่ว่า Setup จะสวยแค่ไหน</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">Entry ก่อน Liquidity Sweep เกิดขึ้น</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">Entry โดยไม่มี MSS ยืนยัน (Inversion)</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">เทรดช่วง 11:10 AM – 2:00 PM ET (NY Lunch)</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">Setup ขัดแย้งกับ IPDA Dealing Range</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">เทรด Setup ที่ 2 หลังจาก Loss แล้ว</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--red)">✕</div><div class="rule-text">Skip SMT — เปิด MES คู่ MNQ เสมอ</div></div>
+    </div>
+
+    <div class="section-label">Risk Management</div>
+    <div class="card card-green" style="margin-bottom:12px">
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">Risk per Trade: 1–2% ของ Account</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">Daily Loss Buffer: หยุดเมื่อเสีย 3%</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">Daily Max Loss: 5% — หยุดทันทีที่ถึง</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">1 Setup ต่อวัน — ถ้าเสียแล้ว หยุดเลย</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">TP1: 1:2 RR (ออก 50–75%)</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">TP2: DOL ถัดไป หรือ 1:3 RR</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--green)">→</div><div class="rule-text">ย้าย SL → Breakeven เมื่อ TP1 ถูก Hit</div></div>
+    </div>
+
+    <div class="section-label">Skip วันนี้ถ้า...</div>
+    <div class="card" style="background:var(--amber-bg);border-color:var(--amber-dim)">
+      <div class="rule-row"><div class="rule-icon" style="color:var(--amber)">!</div><div class="rule-text">มี High Impact News ก่อน/ระหว่าง Macro Window</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--amber)">!</div><div class="rule-text">Bias ไม่ชัด — D1 และ H4 ขัดแย้งกัน</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--amber)">!</div><div class="rule-text">ไม่เห็น Liquidity Pool ที่ชัดเจนทั้งสองฝั่ง</div></div>
+      <div class="rule-row"><div class="rule-icon" style="color:var(--amber)">!</div><div class="rule-text">Sweep ไม่เกิดก่อน 10:20</div></div>
+    </div>
+  </div>
+  <div class="golden">
+    <div class="golden-text">วันที่ไม่มี Setup ชัด = วันที่ดีที่สุดคือไม่เทรด</div>
+  </div>
+</div>
+
+<!-- PAGE: CONCEPTS -->
+<div class="page" id="page-concepts">
+  <div class="section">
+    <div class="section-label">ICT Concepts ที่ Hydra ใช้</div>
+
+    <div class="acc-divider"></div>
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">DOL — Draw on Liquidity</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px">เป้าหมายที่ราคากำลังวิ่งหา<br><br><b style="color:var(--text1)">DOL ยังไม่ถึง</b> → เทรดตามทิศไปหา (DOL = TP)<br><b style="color:var(--text1)">DOL ถึงแล้ว / ถูก Sweep</b> → รอเทรดสวน (DOL ใหม่ฝั่งตรงข้าม)</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">IPDA — 20/40/60 Day Cycle</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px">นับย้อนหลัง 20, 40, 60 แท่ง Daily<br><br>แต่ละ Cycle สร้าง Dealing Range:<br><b style="color:var(--text1)">Discount Zone</b> (ใต้ 50%) = เน้น Buy<br><b style="color:var(--text1)">Premium Zone</b> (เหนือ 50%) = เน้น Sell<br><b style="color:var(--text1)">OTE</b> = 62–79% ของ Range = Entry ที่ดีที่สุด</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">BISI / SIBI</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px"><b style="color:var(--blue)">BISI</b> (Buy Side Imbalance / Sell Side Inefficiency) = Bullish FVG → Support Zone → Entry Buy<br><br><b style="color:var(--red)">SIBI</b> (Sell Side Imbalance / Buy Side Inefficiency) = Bearish FVG → Resistance Zone → Entry Sell</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">SMT — Smart Money Technique</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px">เปิด MNQ และ MES คู่กันเสมอ<br><br><b style="color:var(--blue)">Bullish SMT</b>: MNQ Sweep Low ใหม่ แต่ MES ไม่ → Buy Signal<br><b style="color:var(--red)">Bearish SMT</b>: MNQ Sweep High ใหม่ แต่ MES ไม่ → Sell Signal<br><br>Divergence = ฝั่งที่ไม่ Sweep คือทิศที่ราคาจะไป</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">MSS — Market Structure Shift</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px">สัญญาณว่า Momentum เปลี่ยนทิศ ใช้ยืนยัน Entry บน M5<br><br><b style="color:var(--blue)">Bullish MSS</b>: ราคาทำ Lower Low แล้วกลับขึ้น Break Swing High ล่าสุด<br><b style="color:var(--red)">Bearish MSS</b>: ราคาทำ Higher High แล้วกลับลง Break Swing Low ล่าสุด<br><br>Inversion ต้องรอ MSS ก่อน Entry เสมอ</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">Liquidity Void</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px">ช่องว่างขนาดใหญ่ที่ราคาวิ่งแรงจนไม่มี Transaction เลย<br><br>ต่างจาก FVG ตรงที่ Void จะ Fill เต็มๆ เสมอ ถ้ามี Void ระหว่างทางไป DOL = ราคาจะผ่านไปเร็วมาก ใช้เป็น TP เพิ่มเติมได้</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+
+    <div class="card" style="margin-bottom:0;border-radius:0;border-left:none;border-right:none;border-top:none">
+      <div class="acc-header" onclick="accToggle(this)">
+        <div class="acc-title">C → M → D (3 Phases)</div>
+        <div class="acc-arrow">▾</div>
+      </div>
+      <div class="acc-body">
+        <div style="font-size:13px;color:var(--text2);line-height:1.7;padding-bottom:4px"><b style="color:var(--text1)">Consolidation</b> → ตลาดสะสม Liquidity ทั้งสองฝั่ง เกิดนอก Macro ได้<br><b style="color:var(--amber)">Manipulation</b> → Sweep Liquidity ฝั่งหนึ่ง (ล่า Stop Loss) ต้องเกิดใน Macro<br><b style="color:var(--green)">Distribution/Expansion</b> → วิ่งหา DOL ฝั่งตรงข้าม ต้องเกิดใน Macro<br><br>Hydra Entry = จุดเริ่มต้นของ Distribution หลัง Manipulation เสร็จ</div>
+      </div>
+    </div>
+    <div class="acc-divider"></div>
+  </div>
+</div>
+
+<script>
+function goPage(id, btn) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0, 0);
+}
+
+function switchModel(side, el) {
+  document.querySelectorAll('#page-inversion .model-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#page-inversion .model-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('inv-' + side).classList.add('active');
+}
+
+function switchBreaker(side, el) {
+  document.querySelectorAll('#page-breaker .model-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('#page-breaker .model-content').forEach(c => c.classList.remove('active'));
+  el.classList.add('active');
+  document.getElementById('brk-' + side).classList.add('active');
+}
+
+function ck(row) {
+  const box = row.querySelector('.check-box');
+  const lbl = row.querySelector('.check-label');
+  box.classList.toggle('on');
+  lbl.classList.toggle('done');
+  updateScore();
+}
+
+function updateScore() {
+  const n = document.querySelectorAll('.check-box.on').length;
+  document.getElementById('score-num').textContent = n;
+  const pct = (n / 9 * 100).toFixed(0);
+  const fill = document.getElementById('prog-fill');
+  fill.style.width = pct + '%';
+  const msg = document.getElementById('score-msg');
+  if (n === 9) { fill.style.background = '#4AE08A'; msg.textContent = 'ครบ — พร้อม Entry'; }
+  else if (n >= 7) { fill.style.background = '#FFB84A'; msg.textContent = 'ใกล้แล้ว — ตรวจอีกครั้ง'; }
+  else { fill.style.background = '#4A9EFF'; msg.textContent = 'ติ๊กให้ครบก่อน Entry'; }
+}
+
+function resetChecklist() {
+  document.querySelectorAll('.check-box').forEach(b => b.classList.remove('on'));
+  document.querySelectorAll('.check-label').forEach(l => l.classList.remove('done'));
+  updateScore();
+}
+
+function accToggle(header) {
+  const body = header.nextElementSibling;
+  header.classList.toggle('open');
+  body.classList.toggle('open');
+}
+</script>
+</body>
+</html>
